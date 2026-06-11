@@ -109,8 +109,47 @@ class ProjectService:
             else:
                 recommendation = "Low Priority"
 
+            persona = "General Contact"
+
+            headline = lead.headline or ""
+
+            if any(
+                keyword in headline
+                for keyword in [
+                    "CTO",
+                    "Engineer",
+                    "Architect",
+                    "Scientist",
+                    "Research"
+                ]
+            ):
+                persona = "Technical Buyer"
+
+            elif any(
+                keyword in headline
+                for keyword in [
+                    "CEO",
+                    "Founder",
+                    "Co-Founder",
+                    "Director"
+                ]
+            ):
+                persona = "Economic Buyer"
+
+            elif any(
+                keyword in headline
+                for keyword in [
+                    "Manager",
+                    "Sales",
+                    "GTM",
+                    "VP"
+                ]
+            ):
+                persona = "Business Champion"
+
             ranked_leads.append({
                 "lead_id": lead.id,
+                "persona": persona,
                 "full_name": lead.full_name,
                 "company": lead.company,
                 "match_score": score,
@@ -173,6 +212,14 @@ class ProjectService:
             if ranked_leads
             else None
         )
+        all_leads = LeadRepository.get_all_leads(db)
+
+        avg_ai_score = (
+            sum(
+                lead.ai_score or 0
+                for lead in all_leads
+            ) / len(all_leads)
+        ) if all_leads else 0
 
         return {
             "project": ranking_data["project"],
@@ -182,6 +229,7 @@ class ProjectService:
             "potential_matches": potential_matches,
             "low_priority": low_priority,
             "average_match_score": round(avg_score, 2),
+            "average_ai_score": round(avg_ai_score, 2),
             "top_match": top_match
         }
     
@@ -232,3 +280,5 @@ class ProjectService:
             "lead": lead.full_name,
             "message": message
         }
+    
+    ABC

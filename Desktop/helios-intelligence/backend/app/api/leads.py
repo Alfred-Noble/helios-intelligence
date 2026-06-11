@@ -85,3 +85,13 @@ def generate_message(
         db=db,
         lead_id=lead_id
     )
+
+@router.post("/{lead_id}/classify")
+def classify_persona(
+    lead_id: int,
+    db: Session = Depends(get_db)
+):
+    return LeadService.classify_persona(
+        db=db,
+        lead_id=lead_id
+    )

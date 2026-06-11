@@ -136,6 +136,52 @@ class LeadService:
                 score += 30
                 reasons.append("AI expertise")
 
+            # Executive Leadership
+
+            if lead.headline and "CEO" in lead.headline:
+                score += 25
+                reasons.append("Executive Leadership")
+
+            if lead.headline and "Co-Founder" in lead.headline:
+                score += 25
+                reasons.append("Founder Experience")
+
+            if lead.headline and "Director" in lead.headline:
+                score += 15
+                reasons.append("Strategic Leadership")
+
+            if lead.headline and "VP" in lead.headline:
+                score += 15
+                reasons.append("Senior Leadership")
+
+            if lead.headline and "Head" in lead.headline:
+                score += 15
+                reasons.append("Department Leadership")
+
+            # Product & Research
+
+            if lead.headline and "Product Manager" in lead.headline:
+                score += 10
+                reasons.append("Product Leadership")
+
+            if lead.headline and "Scientist" in lead.headline:
+                score += 15
+                reasons.append("Research Expertise")
+
+            if lead.headline and "Architect" in lead.headline:
+                score += 15
+                reasons.append("Technical Architecture")
+
+            # GTM
+
+            if lead.headline and "Sales" in lead.headline:
+                score += 10
+                reasons.append("Revenue Ownership")
+
+            if lead.headline and "GTM" in lead.headline:
+                score += 15
+                reasons.append("Go-To-Market Expertise")
+
         # Company Bonus
         if lead.company:
             score += 5
@@ -203,4 +249,64 @@ class LeadService:
         return {
             "lead_id": lead.id,
             "message": message
+        }
+    
+    @staticmethod
+    def classify_persona(
+        db: Session,
+        lead_id: int
+    ):
+        lead = LeadRepository.get_by_id(
+            db=db,
+            lead_id=lead_id
+        )
+
+        if not lead:
+            return {
+                "error": "Lead not found"
+            }
+
+        headline = lead.headline or ""
+
+        if any(
+            keyword in headline
+            for keyword in [
+                "CTO",
+                "Engineer",
+                "Architect",
+                "Scientist",
+                "Research"
+            ]
+        ):
+            persona = "Technical Buyer"
+
+        elif any(
+            keyword in headline
+            for keyword in [
+                "CEO",
+                "Founder",
+                "Co-Founder",
+                "Director"
+            ]
+        ):
+            persona = "Economic Buyer"
+
+        elif any(
+            keyword in headline
+            for keyword in [
+                "Manager",
+                "Sales",
+                "GTM",
+                "VP"
+            ]
+        ):
+            persona = "Business Champion"
+
+        else:
+            persona = "General Contact"
+
+        return {
+            "lead_id": lead.id,
+            "full_name": lead.full_name,
+            "persona": persona
         }
