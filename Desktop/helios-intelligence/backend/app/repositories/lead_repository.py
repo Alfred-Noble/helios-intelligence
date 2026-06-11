@@ -61,3 +61,64 @@ class LeadRepository:
 
         return items, total
     
+    @staticmethod
+    def bulk_create(
+        db: Session,
+        leads: list
+    ):
+        db.add_all(leads)
+        db.commit()
+
+    @staticmethod
+    def get_by_id(
+        db: Session,
+        lead_id: int
+    ):
+        return (
+            db.query(Lead)
+            .filter(Lead.id == lead_id)
+            .first()
+        )
+
+
+    @staticmethod
+    def save(
+        db: Session,
+        lead: Lead
+    ):
+        db.commit()
+        db.refresh(lead)
+
+        return lead
+    
+    @staticmethod
+    def exists_by_email_or_linkedin(
+        db: Session,
+        email: str | None,
+        linkedin_url: str | None
+    ):
+        query = db.query(Lead)
+
+        if email:
+            existing = query.filter(
+                Lead.email == email
+            ).first()
+
+            if existing:
+                return True
+
+        if linkedin_url:
+            existing = query.filter(
+                Lead.linkedin_url == linkedin_url
+            ).first()
+
+            if existing:
+                return True
+
+        return False
+    
+    @staticmethod
+    def get_all_leads(
+        db: Session
+    ):
+        return db.query(Lead).all()

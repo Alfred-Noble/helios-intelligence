@@ -2,6 +2,12 @@
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from fastapi import UploadFile, File
+from app.utils.csv_parser import read_csv
+from app.utils.csv_parser import (
+    read_csv,
+    convert_rows_to_leads
+)
 
 from app.db.dependencies import get_db
 from app.schemas.lead import LeadCreate
@@ -39,4 +45,43 @@ def get_leads(
         search=search,
         industry=industry,
         location=location
+    )
+
+@router.post("/upload-csv")
+def upload_csv(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    if not file.filename.endswith(".csv"):
+        return {
+            "error": "Only CSV files are allowed"
+        }
+
+    df = read_csv(file.file)
+
+    leads = convert_rows_to_leads(df)
+
+    return LeadService.import_csv(
+        db=db,
+        leads=leads
+    )
+
+@router.post("/{lead_id}/score")
+def score_lead(
+    lead_id: int,
+    db: Session = Depends(get_db)
+):
+    return LeadService.score_lead(
+        db=db,
+        lead_id=lead_id
+    )
+
+@router.post("/{lead_id}/generate-message")
+def generate_message(
+    lead_id: int,
+    db: Session = Depends(get_db)
+):
+    return LeadService.generate_message(
+        db=db,
+        lead_id=lead_id
     )
