@@ -36,9 +36,22 @@ body {
 }
 
 .card:hover {
-  transform: translateY(-5px);
+
+  transform:
+    translateY(-8px)
+    scale(1.02);
 
   border-color: #60a5fa;
+
+  box-shadow:
+    0 25px 60px rgba(
+      96,
+      165,
+      250,
+      .25
+    );
+
+  transition: .3s ease;
 }
 
 .stat-number {
@@ -53,4 +66,81 @@ body {
 
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+body {
+  background: linear-gradient(
+    -45deg,
+    #020617,
+    #0f172a,
+    #1e293b,
+    #312e81
+  );
+
+  background-size: 400% 400%;
+
+  animation: gradientMove 15s ease infinite;
+
+  color: white;
+  min-height: 100vh;
+
+  font-family:
+    Inter,
+    Arial,
+    sans-serif;
+}
+
+.orb {
+  position: fixed;
+
+  width: 300px;
+  height: 300px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(96,165,250,.45),
+    transparent
+  );
+
+  filter: blur(70px);
+
+  top: 120px;
+  right: 100px;
+
+  animation: floatOrb 8s ease-in-out infinite;
+
+  z-index: -1;
+}
+
+@keyframes floatOrb {
+
+  0%,100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-35px);
+  }
+}
+
+.hero-title {
+
+  font-size: 64px;
+
+  font-weight: 900;
+
+  background:
+    linear-gradient(
+      to right,
+      #60a5fa,
+      #c084fc
+    );
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  margin-bottom: 10px;
 }
