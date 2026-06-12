@@ -12,6 +12,8 @@ from app.utils.csv_parser import (
 from app.db.dependencies import get_db
 from app.schemas.lead import LeadCreate
 from app.services.lead_service import LeadService
+from app.services.email_service import EmailService
+from app.repositories.lead_repository import LeadRepository
 
 router = APIRouter(
     prefix="/leads",
@@ -94,4 +96,35 @@ def classify_persona(
     return LeadService.classify_persona(
         db=db,
         lead_id=lead_id
+    )
+
+@router.post("/{lead_id}/send-email")
+def send_email(
+    lead_id: int,
+    db: Session = Depends(get_db)
+):
+    lead = LeadRepository.get_by_id(
+        db=db,
+        lead_id=lead_id
+    )
+
+    if not lead:
+        return {
+            "error": "Lead not found"
+        }
+
+    if not lead.email:
+        return {
+            "error": "Lead has no email"
+        }
+
+    message = (
+        lead.outreach_message
+        or "Hello from Helios Intelligence"
+    )
+
+    return EmailService.send_email(
+        recipient=lead.email,
+        subject="Helios Intelligence Outreach",
+        body=message
     )
